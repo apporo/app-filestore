@@ -1,5 +1,5 @@
 module.exports = require('devebot').registerLayerware(__dirname, [
-  'app-webserver'
+  'app-webweaver'
 ], [
-  'devebot-co-mongodb'
+  'devebot-co-mongojs'
 ]);
