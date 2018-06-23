@@ -28,9 +28,24 @@ function FilestoreHandler(params) {
 
   let mongoManipulator = params["mongojs#manipulator"];
 
+  this.getFileUrls = function(fileIds) {
+    fileIds = fileIds || [];
+    return Promise.map(fileIds, function(fileId) {
+      let r = mongoManipulator.findOneDocument(pluginCfg.collections.FILE, {fileId});
+      return r.then(function(fileData) {
+        if (lodash.isEmpty(fileData)) {
+          return { fileId }
+        } else {
+          return lodash.pick(fileData, ['fileId', 'fileUrl']);
+        }
+      })
+    }, {concurrency: 4});
+  }
+
   /**
    * 
    * @param {*} args
+   *   fileId: UUID
    *   fileType: 'path', 'stream' or 'base64'
    *   fileSource: url, stream, or base64 String
    *   fileInfo: (size, name, path. ...)
@@ -42,14 +57,12 @@ function FilestoreHandler(params) {
     }
 
     fileId = fileId || uuid.v4();
+    fileInfo = fileInfo || {};
+
     let fileName = fileInfo.name || fileId;
     let ctx = {};
 
     return Promise.resolve().then(function(result) {
-      if (lodash.isEmpty(fileInfo)) {
-        return Promise.reject('invalid_upload_fields');
-      }
-
       fileInfo.fileId = fileId;
       fileInfo.status = 'intermediate';
 
@@ -69,7 +82,9 @@ function FilestoreHandler(params) {
           });
         })();
         case 'base64':
+        // fileSource is the file content in base64 format
         let fs_writeFile = Promise.promisify(fs.writeFile, {context: fs});
+        fileSource = fileSource.replace(/^data:image\/[a-zA-Z0-9]*;base64,/, "");
         return fs_writeFile(path.join(ctx.uploadDirPath, fileName), fileSource, {
           encoding: 'base64'
         });
@@ -92,6 +107,18 @@ function FilestoreHandler(params) {
   }
 };
 
-FilestoreHandler.referenceList = ["mongojs#manipulator"]
+function base64MimeType(encoded) {
+  var result = null;
+  if (typeof encoded !== 'string') {
+    return result;
+  }
+  var mime = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+  if (mime && mime.length) {
+    result = mime[1];
+  }
+  return result;
+}
+
+FilestoreHandler.referenceList = ["mongojs#manipulator"];
 
 module.exports = FilestoreHandler;
