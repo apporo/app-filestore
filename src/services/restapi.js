@@ -1,50 +1,47 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var os = require('os');
-var util = require('util');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const util = require('util');
 
-var easyimage = require('easyimage');
-var formidable = require('formidable');
-var mime = require('mime');
-var mkdirp = require('mkdirp');
-var mv = require('mv');
-var rimraf = require('rimraf');
-var uuid = require('uuid');
+const easyimage = require('easyimage');
+const formidable = require('formidable');
+const mime = require('mime');
+const mkdirp = require('mkdirp');
+const rimraf = require('rimraf');
+const uuid = require('uuid');
 
-var Devebot = require('devebot');
-var Promise = Devebot.require('bluebird');
-var lodash = Devebot.require('lodash');
-var debuglog = Devebot.require('pinbug')('app-filestore:service');
+const Devebot = require('devebot');
+const Promise = Devebot.require('bluebird');
+const lodash = Devebot.require('lodash');
+const debuglog = Devebot.require('pinbug')('app-filestore:service');
 
-var Service = function(params) {
-  debuglog(' + constructor begin ...');
-
+function FilestoreRestapi(params) {
   params = params || {};
 
-  var self = this;
-
+  let self = this;
   let LX = params.loggingFactory.getLogger();
 
-  var pluginCfg = params.sandboxConfig || {};
-  var contextPath = pluginCfg.contextPath || '/filestore';
+  let pluginCfg = params.sandboxConfig || {};
+  let contextPath = pluginCfg.contextPath || '/filestore';
 
-  var tmpRootDir = os.tmpdir() + '/devebot/filestore';
-  var uploadDir = pluginCfg.uploadDir;
-  var thumbnailDir = pluginCfg.thumbnailDir || uploadDir;
+  let tmpRootDir = os.tmpdir() + '/devebot/filestore';
+  let uploadDir = pluginCfg.uploadDir;
+  let thumbnailDir = pluginCfg.thumbnailDir || uploadDir;
 
+  let filestoreHandler = params["handler"];
   let mongoManipulator = params["mongojs#manipulator"];
   let webweaverService = params["app-webweaver/webweaverService"];
   let express = webweaverService.express;
 
-  var filestoreRouter = express();
+  let filestoreRouter = express();
 
   filestoreRouter.route([
     '/picture/:fileId/:width/:height',
     '/picture/:fileId/:width/:height/:filename'
   ]).get(function(req, res, next) {
-    var box = {};
+    let box = {};
     Promise.resolve().then(function() {
       if (debuglog.enabled) {
         debuglog(' - /picture/%s/%s/%s is request', 
@@ -106,15 +103,15 @@ var Service = function(params) {
         });  
       })();
     }).then(function(thumbnailFile) {
-      var filename = box.fileInfo.name;
-      var mimetype = mime.lookup(thumbnailFile);
+      let filename = box.fileInfo.name;
+      let mimetype = mime.lookup(thumbnailFile);
       if (debuglog.enabled) {
         debuglog(' - filename: %s', filename);
         debuglog(' - mimetype: %s', mimetype);
       }
       res.setHeader('Content-disposition', 'attachment; filename=' + filename);
       res.setHeader('Content-type', mimetype);
-      var filestream = fs.createReadStream(thumbnailFile);
+      let filestream = fs.createReadStream(thumbnailFile);
       filestream.on('end', function() {
         if (debuglog.enabled) {
           debuglog(' - the thumbnail has been full-loaded');
@@ -146,9 +143,9 @@ var Service = function(params) {
       if (lodash.isEmpty(fileInfo)) {
         return Promise.reject('fileId_not_found');
       }
-      var filename = fileInfo.name || path.basename(fileInfo.path);
-      var filepath = path.join(uploadDir, fileInfo.fileId, fileInfo.name);
-      var mimetype = mime.lookup(fileInfo.path);
+      let filename = fileInfo.name || path.basename(fileInfo.path);
+      let filepath = path.join(uploadDir, fileInfo.fileId, fileInfo.name);
+      let mimetype = mime.lookup(fileInfo.path);
       if (debuglog.enabled) {
         debuglog(' - filename: %s', filename);
         debuglog(' - filepath: %s', filepath);
@@ -156,7 +153,7 @@ var Service = function(params) {
       }
       res.setHeader('Content-disposition', 'attachment; filename=' + filename);
       res.setHeader('Content-type', mimetype);
-      var filestream = fs.createReadStream(filepath);
+      let filestream = fs.createReadStream(filepath);
       filestream.on('end', function() {
         if (debuglog.enabled) {
           debuglog(' - the file has been full-loaded');  
@@ -173,8 +170,8 @@ var Service = function(params) {
       debuglog(' - the /upload is requested ...');
     }
 
-    var tmpId = uuid.v4();
-    var ctx = {
+    let tmpId = uuid.v4();
+    let ctx = {
       tmpDir: path.join(tmpRootDir, tmpId)
     };
 
@@ -185,9 +182,9 @@ var Service = function(params) {
       return Promise.promisify(mkdirp)(ctx.tmpDir);
     }).then(function() {
       return Promise.promisify(function(done) {
-        var result = { fields: {}, files: {} };
+        let result = { fields: {}, files: {} };
 
-        var form = new formidable.IncomingForm();
+        let form = new formidable.IncomingForm();
         form.uploadDir = ctx.tmpDir;
         form.keepExtensions = true;
         form
@@ -214,44 +211,21 @@ var Service = function(params) {
       if (debuglog.enabled) {
         debuglog(' - the /upload result: %s', JSON.stringify(result, null, 2));
       }
-
       ctx.fileId = result.fields.fileId || uuid.v4();
-      ctx.apifilename = result.fields.apifilename;
       ctx.fileInfo = lodash.pick(result.files.data || {}, ['size', 'path', 'name', 'type', 'mtime']);
-
+      ctx.fileType = 'path';
+      ctx.fileSource = ctx.fileInfo.path;
       if (lodash.isEmpty(ctx.fileId) || lodash.isEmpty(ctx.fileInfo)) {
         return Promise.reject('invalid_upload_fields');
       }
-
-      ctx.fileInfo.fileId = ctx.fileId;
-      ctx.fileInfo.status = 'intermediate';
-
-      return mongoManipulator.updateDocument(
-        pluginCfg.collections.FILE,
-        { fileId: ctx.fileId }, ctx.fileInfo, { multi: true, upsert: true });
-    }).then(function() {
-      ctx.uploadDirPath = path.join(uploadDir, ctx.fileId);
-      return Promise.promisify(mkdirp)(ctx.uploadDirPath);
-    }).then(function(result) {
-      return Promise.promisify(function(done) {
-        mv(ctx.fileInfo.path, path.join(ctx.uploadDirPath, ctx.fileInfo.name), function(err) {
-          done(err);
-        });
-      })();
-    }).then(function() {
-      ctx.fileInfo.path = path.join(ctx.uploadDirPath, ctx.fileInfo.name);
-      ctx.fileInfo.status = 'ok';
-      return mongoManipulator.updateDocument(
-        pluginCfg.collections.FILE,
-        { fileId: ctx.fileId }, ctx.fileInfo, { multi: true, upsert: false });
-    }).then(function() {
+      return filestoreHandler.saveFile(ctx);
+    }).then(function(returnInfo) {
       if (debuglog.enabled) {
-        debuglog(' - the /upload has been successful.');
+        debuglog(' - the file has been saved successfully: %s', JSON.stringify(returnInfo, null, 2));
       }
-      var returnInfo = {};
-      returnInfo[ctx.apifilename || 'fileId'] = ctx.fileId;
       returnInfo['fileUrl'] = '/filestore/download/' + ctx.fileId;
       res.json(returnInfo);
+      return returnInfo;
     }).catch(function(err) {
       if (debuglog.enabled) {
         debuglog(' - error: %s; context: %s', JSON.stringify(err), JSON.stringify(ctx, null, 2));
@@ -271,7 +245,7 @@ var Service = function(params) {
           }
         });
       }
-    })
+    });
   });
 
   this.getFilestoreLayer = function() {
@@ -291,6 +265,10 @@ var Service = function(params) {
   debuglog(' - constructor end!');
 };
 
-Service.referenceList = ["app-webweaver/webweaverService", "mongojs#manipulator"]
+FilestoreRestapi.referenceList = [
+  "handler",
+  "app-webweaver/webweaverService",
+  "mongojs#manipulator"
+]
 
-module.exports = Service;
+module.exports = FilestoreRestapi;
