@@ -10,12 +10,14 @@ app.getSandboxService = function(serviceName) {
 
 app.getSandboxService('app-filestore/handler').then(function(handler) {
   var fileBase64 = fs.readFileSync(path.join(__dirname, './images/logbeat.png')).toString('base64');
-  console.log('filebase64: \n%s', fileBase64);
+  false && console.log('file content in base64 format: \n%s', fileBase64);
   var ok = handler.saveFile({
     fileSource: fileBase64,
-    fileInfo: {
-    },
+    fileInfo: {},
     fileType: 'base64'
   });
-  ok.then(console.log);
+  return ok;
+}).then(function(result) {
+  console.log(result);
+  return app.server.close();
 });

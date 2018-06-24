@@ -14,6 +14,7 @@ const uuid = require('uuid');
 
 const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
+const chores = Devebot.require('chores');
 const lodash = Devebot.require('lodash');
 const debuglog = Devebot.require('pinbug')('app-filestore:service');
 
@@ -22,6 +23,9 @@ function FilestoreRestapi(params) {
 
   let self = this;
   let LX = params.loggingFactory.getLogger();
+  let TR = params.loggingFactory.getTracer();
+  let packageName = params.packageName || 'app-filestore';
+  let blockRef = chores.getBlockRef(__filename, packageName);
 
   let pluginCfg = params.sandboxConfig || {};
   let contextPath = pluginCfg.contextPath || '/filestore';
@@ -223,7 +227,7 @@ function FilestoreRestapi(params) {
       if (debuglog.enabled) {
         debuglog(' - the file has been saved successfully: %s', JSON.stringify(returnInfo, null, 2));
       }
-      returnInfo['fileUrl'] = '/filestore/download/' + ctx.fileId;
+      returnInfo['fileUrl'] = path.join(contextPath, '/download/' + ctx.fileId);
       res.json(returnInfo);
       return returnInfo;
     }).catch(function(err) {
@@ -261,8 +265,6 @@ function FilestoreRestapi(params) {
       self.getFilestoreLayer()
     ], pluginCfg.priority);
   }
-
-  debuglog(' - constructor end!');
 };
 
 FilestoreRestapi.referenceList = [
