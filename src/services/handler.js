@@ -91,6 +91,7 @@ function FilestoreHandler(params) {
       }
     }).then(function() {
       fileInfo.path = path.join(ctx.uploadDirPath, fileName);
+      fileInfo.fileUrl = path.join(contextPath, '/download/' + fileId);
       fileInfo.status = 'ok';
       return mongoManipulator.updateDocument(
         pluginCfg.collections.FILE,
@@ -101,7 +102,7 @@ function FilestoreHandler(params) {
       }
       let returnInfo = {};
       returnInfo['fileId'] = fileId;
-      returnInfo['fileUrl'] = '/filestore/download/' + fileId;
+      returnInfo['fileUrl'] = path.join(contextPath, '/download/' + fileId);
       return returnInfo;
     });
   }
