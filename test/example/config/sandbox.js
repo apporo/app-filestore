@@ -1,6 +1,6 @@
 var path = require('path');
 
-var contextPath = '/filestore';
+var contextPath = '/example';
 
 module.exports = {
   application: {
@@ -8,6 +8,7 @@ module.exports = {
   },
   plugins: {
     appFilestore: {
+      contextPath: contextPath,
       uploadDir: path.join(__dirname, '../data')
     },
     appWebweaver: {

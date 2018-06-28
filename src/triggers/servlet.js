@@ -14,9 +14,7 @@ function FilestoreServlet(params) {
   };
 
   this.stop = function() {
-    return Promise.resolve().then(function() {
-      return mongoManipulator.close();
-    });
+    return Promise.resolve();
   };
 };
 

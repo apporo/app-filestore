@@ -23,5 +23,5 @@ You can upload a file using the __curl__ utility:
 ```shell
 $ curl -i -X POST -H "Content-Type: multipart/form-data" \
     -F "data=@./test/lab/images/logbeat.png;fileId=0987654321" \
-    "http://localhost:7979/filestore/upload"
+    "http://localhost:7979/example/upload"
 ```

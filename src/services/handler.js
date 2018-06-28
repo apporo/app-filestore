@@ -58,8 +58,9 @@ function FilestoreHandler(params) {
 
     fileId = fileId || uuid.v4();
     fileInfo = fileInfo || {};
+    fileInfo.name = fileInfo.name || fileId;
 
-    let fileName = fileInfo.name || fileId;
+    let fileName = fileInfo.name;
     let ctx = {};
 
     return Promise.resolve().then(function(result) {
