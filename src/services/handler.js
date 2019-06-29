@@ -17,7 +17,6 @@ const debuglog = Devebot.require('pinbug')('app-filestore:handler');
 function FilestoreHandler(params) {
   params = params || {};
 
-  let self = this;
   let LX = params.loggingFactory.getLogger();
 
   let pluginCfg = params.sandboxConfig || {};

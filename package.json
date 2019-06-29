@@ -1,6 +1,6 @@
 {
   "name": "app-filestore",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Devebot application filestore layerware",
   "homepage": "https://github.com/apporo/app-filestore.git",
   "author": {
@@ -31,14 +31,14 @@
     "devebot-plugin"
   ],
   "peerDependencies": {
-    "app-webweaver": "^0.2.2",
-    "devebot": "^0.2.6",
-    "devebot-co-mongojs": "^0.2.0"
+    "app-webweaver": "^0.3.0",
+    "devebot": "^0.3.0",
+    "devebot-co-mongojs": "^0.3.0"
   },
   "dependencies": {
-    "app-webweaver": "^0.2.2",
-    "devebot": "^0.2.6",
-    "devebot-co-mongojs": "^0.2.0",
+    "app-webweaver": "^0.3.0",
+    "devebot": "^0.3.0",
+    "devebot-co-mongojs": "^0.3.0",
     "easyimage": "^2.1.0",
     "formidable": "^1.0.17",
     "mime": "^1.3.4",

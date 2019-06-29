@@ -21,11 +21,8 @@ const debuglog = Devebot.require('pinbug')('app-filestore:service');
 function FilestoreRestapi(params) {
   params = params || {};
 
-  let self = this;
   let LX = params.loggingFactory.getLogger();
   let TR = params.loggingFactory.getTracer();
-  let packageName = params.packageName || 'app-filestore';
-  let blockRef = chores.getBlockRef(__filename, packageName);
 
   let pluginCfg = params.sandboxConfig || {};
   let contextPath = pluginCfg.contextPath || '/filestore';
@@ -262,7 +259,7 @@ function FilestoreRestapi(params) {
 
   if (pluginCfg.autowired !== false) {
     webweaverService.push([
-      self.getFilestoreLayer()
+      this.getFilestoreLayer()
     ], pluginCfg.priority);
   }
 };
