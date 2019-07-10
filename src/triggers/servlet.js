@@ -4,9 +4,7 @@ const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
 const lodash = Devebot.require('lodash');
 
-function FilestoreServlet(params) {
-  params = params || {};
-
+function FilestoreServlet(params = {}) {
   let mongoManipulator = params["mongojs#manipulator"];
 
   this.start = function() {

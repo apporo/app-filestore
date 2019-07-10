@@ -2,8 +2,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
-const util = require('util');
 
 const mkdirp = require('mkdirp');
 const mv = require('mv');
@@ -12,11 +10,8 @@ const uuid = require('uuid');
 const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
 const lodash = Devebot.require('lodash');
-const debuglog = Devebot.require('pinbug')('app-filestore:handler');
 
-function FilestoreHandler(params) {
-  params = params || {};
-
+function FilestoreHandler(params = {}) {
   let LX = params.loggingFactory.getLogger();
 
   let pluginCfg = params.sandboxConfig || {};
@@ -51,9 +46,8 @@ function FilestoreHandler(params) {
    */
   this.saveFile = function(args) {
     let {fileId, fileType, fileSource, fileInfo} = args || {};
-    if (debuglog.enabled) {
-      debuglog(' - saveFile: %s', JSON.stringify(args, null, 2));
-    }
+
+    LX.has('debug') && LX.log('debug', ' - saveFile: %s', JSON.stringify(args, null, 2));
 
     fileId = fileId || uuid.v4();
     fileInfo = fileInfo || {};
@@ -97,9 +91,7 @@ function FilestoreHandler(params) {
         pluginCfg.collections.FILE,
         { fileId: fileId }, fileInfo, { multi: true, upsert: false });
     }).then(function() {
-      if (debuglog.enabled) {
-        debuglog(' - the /upload has been successful.');
-      }
+      LX.has('debug') && LX.log('debug', ' - the /upload has been successful.');
       let returnInfo = {};
       returnInfo['fileId'] = fileId;
       returnInfo['fileUrl'] = path.join(contextPath, '/download/' + fileId);

@@ -18,11 +18,9 @@ const chores = Devebot.require('chores');
 const lodash = Devebot.require('lodash');
 const debuglog = Devebot.require('pinbug')('app-filestore:service');
 
-function FilestoreRestapi(params) {
-  params = params || {};
-
-  let LX = params.loggingFactory.getLogger();
-  let TR = params.loggingFactory.getTracer();
+function FilestoreRestapi(params = {}) {
+  let L = params.loggingFactory.getLogger();
+  let T = params.loggingFactory.getTracer();
 
   let pluginCfg = params.sandboxConfig || {};
   let contextPath = pluginCfg.contextPath || '/filestore';
