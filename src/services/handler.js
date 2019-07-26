@@ -56,17 +56,20 @@ function Handler(params = {}) {
     let fileName = fileInfo.name;
     let ctx = {};
 
-    return Promise.resolve().then(function(result) {
+    return Promise.resolve()
+    .then(function(result) {
       fileInfo.fileId = fileId;
       fileInfo.status = 'intermediate';
 
       return mongoManipulator.updateDocument(
         pluginCfg.collections.FILE,
         { fileId: fileId }, fileInfo, { multi: true, upsert: true });
-    }).then(function() {
+    })
+    .then(function() {
       ctx.uploadDirPath = path.join(uploadDir, fileId);
       return Promise.promisify(mkdirp)(ctx.uploadDirPath);
-    }).then(function() {
+    })
+    .then(function() {
       switch(fileType) {
         case 'path':
         return Promise.promisify(function(done) {
@@ -83,14 +86,16 @@ function Handler(params = {}) {
           encoding: 'base64'
         });
       }
-    }).then(function() {
+    })
+    .then(function() {
       fileInfo.path = path.join(ctx.uploadDirPath, fileName);
       fileInfo.fileUrl = path.join(contextPath, '/download/' + fileId);
       fileInfo.status = 'ok';
       return mongoManipulator.updateDocument(
         pluginCfg.collections.FILE,
         { fileId: fileId }, fileInfo, { multi: true, upsert: false });
-    }).then(function() {
+    })
+    .then(function() {
       L.has('debug') && L.log('debug', ' - the /upload has been successful.');
       let returnInfo = {};
       returnInfo['fileId'] = fileId;

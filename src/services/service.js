@@ -37,7 +37,8 @@ function Service(params = {}) {
     '/picture/:fileId/:width/:height/:filename'
   ]).get(function(req, res, next) {
     let box = {};
-    Promise.resolve().then(function() {
+    Promise.resolve()
+    .then(function() {
       if (debuglog.enabled) {
         debuglog(' - /picture/%s/%s/%s is request', 
             req.params.fileId, req.params.width, req.params.height);
@@ -62,7 +63,8 @@ function Service(params = {}) {
           fileId: req.params.fileId,
           status: 'ok'
         });
-    }).then(function(fileInfo) {
+    })
+    .then(function(fileInfo) {
       if (lodash.isEmpty(fileInfo) || lodash.isEmpty(fileInfo.name)) {
         fileInfo = {
           name: 'no-image.png',
@@ -97,7 +99,8 @@ function Service(params = {}) {
           );
         });  
       })();
-    }).then(function(thumbnailFile) {
+    })
+    .then(function(thumbnailFile) {
       let filename = box.fileInfo.name;
       let mimetype = mime.lookup(thumbnailFile);
       if (debuglog.enabled) {
@@ -113,7 +116,8 @@ function Service(params = {}) {
         }
       });
       filestream.pipe(res);
-    }).catch(function(err) {
+    })
+    .catch(function(err) {
       res.status(404).send('Error: ' + JSON.stringify(err));
     });
   });
@@ -122,7 +126,8 @@ function Service(params = {}) {
     '/download/:fileId',
     '/download/:fileId/:filename'
   ]).get(function(req, res, next) {
-    Promise.resolve().then(function() {
+    Promise.resolve()
+    .then(function() {
       if (debuglog.enabled) {
         debuglog(' - /download/:fileId is request: %s', req.params.fileId);
       }
@@ -134,7 +139,8 @@ function Service(params = {}) {
           fileId: req.params.fileId,
           status: 'ok'
         });
-    }).then(function(fileInfo) {
+    })
+    .then(function(fileInfo) {
       if (lodash.isEmpty(fileInfo)) {
         return Promise.reject('fileId_not_found');
       }
@@ -155,7 +161,8 @@ function Service(params = {}) {
         }
       });
       filestream.pipe(res);
-    }).catch(function(err) {
+    })
+    .catch(function(err) {
       res.status(404).send('Error: ' + JSON.stringify(err));
     });
   });
@@ -170,12 +177,14 @@ function Service(params = {}) {
       tmpDir: path.join(tmpRootDir, tmpId)
     };
 
-    Promise.resolve().then(function() {
+    Promise.resolve()
+    .then(function() {
       if (debuglog.enabled) {
         debuglog(' - the tmpDir: %s', ctx.tmpDir);
       }
       return Promise.promisify(mkdirp)(ctx.tmpDir);
-    }).then(function() {
+    })
+    .then(function() {
       return Promise.promisify(function(done) {
         let result = { fields: {}, files: {} };
 
@@ -202,7 +211,8 @@ function Service(params = {}) {
 
         form.parse(req);
       })();
-    }).then(function(result) {
+    })
+    .then(function(result) {
       if (debuglog.enabled) {
         debuglog(' - the /upload result: %s', JSON.stringify(result, null, 2));
       }
@@ -214,19 +224,22 @@ function Service(params = {}) {
         return Promise.reject('invalid_upload_fields');
       }
       return filestoreHandler.saveFile(ctx);
-    }).then(function(returnInfo) {
+    })
+    .then(function(returnInfo) {
       if (debuglog.enabled) {
         debuglog(' - the file has been saved successfully: %s', JSON.stringify(returnInfo, null, 2));
       }
       returnInfo['fileUrl'] = path.join(contextPath, '/download/' + ctx.fileId);
       res.json(returnInfo);
       return returnInfo;
-    }).catch(function(err) {
+    })
+    .catch(function(err) {
       if (debuglog.enabled) {
         debuglog(' - error: %s; context: %s', JSON.stringify(err), JSON.stringify(ctx, null, 2));
       }
       res.status(404).json({ error: JSON.stringify(err) });
-    }).finally(function() {
+    })
+    .finally(function() {
       if (ctx.tmpDir.match(tmpRootDir)) {
         rimraf(ctx.tmpDir, function(err) {
           if (err) {
