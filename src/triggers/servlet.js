@@ -2,10 +2,9 @@
 
 const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
-const lodash = Devebot.require('lodash');
 
-function FilestoreServlet(params = {}) {
-  let mongoManipulator = params["mongojs#manipulator"];
+function Servlet(params = {}) {
+  const { mongoManipulator } = params;
 
   this.start = function() {
     return Promise.resolve();
@@ -16,6 +15,8 @@ function FilestoreServlet(params = {}) {
   };
 };
 
-FilestoreServlet.referenceList = [ "mongojs#manipulator" ];
+Servlet.referenceHash = {
+  mongoManipulator: "mongojs#manipulator"
+};
 
-module.exports = FilestoreServlet;
+module.exports = Servlet;

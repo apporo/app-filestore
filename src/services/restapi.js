@@ -14,27 +14,23 @@ const uuid = require('uuid');
 
 const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
-const chores = Devebot.require('chores');
 const lodash = Devebot.require('lodash');
 const debuglog = Devebot.require('pinbug')('app-filestore:service');
 
-function FilestoreRestapi(params = {}) {
-  let L = params.loggingFactory.getLogger();
-  let T = params.loggingFactory.getTracer();
+function Service(params = {}) {
+  const { filestoreHandler, mongoManipulator, webweaverService } = params;
+  const L = params.loggingFactory.getLogger();
+  const T = params.loggingFactory.getTracer();
 
-  let pluginCfg = params.sandboxConfig || {};
-  let contextPath = pluginCfg.contextPath || '/filestore';
+  const pluginCfg = params.sandboxConfig || {};
+  const contextPath = pluginCfg.contextPath || '/filestore';
 
-  let tmpRootDir = os.tmpdir() + '/devebot/filestore';
-  let uploadDir = pluginCfg.uploadDir;
-  let thumbnailDir = pluginCfg.thumbnailDir || uploadDir;
+  const tmpRootDir = os.tmpdir() + '/devebot/filestore';
+  const uploadDir = pluginCfg.uploadDir;
+  const thumbnailDir = pluginCfg.thumbnailDir || uploadDir;
+  const express = webweaverService.express;
 
-  let filestoreHandler = params["handler"];
-  let mongoManipulator = params["mongojs#manipulator"];
-  let webweaverService = params["app-webweaver/webweaverService"];
-  let express = webweaverService.express;
-
-  let filestoreRouter = express();
+  const filestoreRouter = express();
 
   filestoreRouter.route([
     '/picture/:fileId/:width/:height',
@@ -262,10 +258,10 @@ function FilestoreRestapi(params = {}) {
   }
 };
 
-FilestoreRestapi.referenceList = [
-  "handler",
-  "app-webweaver/webweaverService",
-  "mongojs#manipulator"
-]
+Service.referenceHash = {
+  filestoreHandler: "handler",
+  webweaverService: "app-webweaver/webweaverService",
+  mongoManipulator: "mongojs#manipulator"
+}
 
-module.exports = FilestoreRestapi;
+module.exports = Service;

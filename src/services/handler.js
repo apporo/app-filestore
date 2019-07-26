@@ -11,16 +11,16 @@ const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
 const lodash = Devebot.require('lodash');
 
-function FilestoreHandler(params = {}) {
-  let LX = params.loggingFactory.getLogger();
+function Handler(params = {}) {
+  const { mongoManipulator } = params;
+  const L = params.loggingFactory.getLogger();
+  const T = params.loggingFactory.getTracer();
 
-  let pluginCfg = params.sandboxConfig || {};
-  let contextPath = pluginCfg.contextPath || '/filestore';
+  const pluginCfg = params.sandboxConfig || {};
+  const contextPath = pluginCfg.contextPath || '/filestore';
 
-  let uploadDir = pluginCfg.uploadDir;
-  let thumbnailDir = pluginCfg.thumbnailDir || uploadDir;
-
-  let mongoManipulator = params["mongojs#manipulator"];
+  const uploadDir = pluginCfg.uploadDir;
+  const thumbnailDir = pluginCfg.thumbnailDir || uploadDir;
 
   this.getFileUrls = function(fileIds) {
     fileIds = fileIds || [];
@@ -44,10 +44,10 @@ function FilestoreHandler(params = {}) {
    *   fileSource: url, stream, or base64 String
    *   fileInfo: (size, name, path. ...)
    */
-  this.saveFile = function(args) {
-    let {fileId, fileType, fileSource, fileInfo} = args || {};
+  this.saveFile = function(args = {}) {
+    let {fileId, fileType, fileSource, fileInfo} = args;
 
-    LX.has('debug') && LX.log('debug', ' - saveFile: %s', JSON.stringify(args, null, 2));
+    L.has('debug') && L.log('debug', ' - saveFile: %s', JSON.stringify(args, null, 2));
 
     fileId = fileId || uuid.v4();
     fileInfo = fileInfo || {};
@@ -91,7 +91,7 @@ function FilestoreHandler(params = {}) {
         pluginCfg.collections.FILE,
         { fileId: fileId }, fileInfo, { multi: true, upsert: false });
     }).then(function() {
-      LX.has('debug') && LX.log('debug', ' - the /upload has been successful.');
+      L.has('debug') && L.log('debug', ' - the /upload has been successful.');
       let returnInfo = {};
       returnInfo['fileId'] = fileId;
       returnInfo['fileUrl'] = path.join(contextPath, '/download/' + fileId);
@@ -112,6 +112,8 @@ function base64MimeType(encoded) {
   return result;
 }
 
-FilestoreHandler.referenceList = ["mongojs#manipulator"];
+Handler.referenceHash = {
+  mongoManipulator: "mongojs#manipulator"
+};
 
-module.exports = FilestoreHandler;
+module.exports = Handler;

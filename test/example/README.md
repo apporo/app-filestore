@@ -5,7 +5,7 @@
 Build the module:
 
 ```shell
-$ npm run build
+npm run build
 ```
 
 Start the example:

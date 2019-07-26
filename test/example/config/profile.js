@@ -1,4 +1,7 @@
 module.exports = {
+  devebot: {
+    mode: 'silent'
+  },
   logger: {
     transports: {
       console: {
