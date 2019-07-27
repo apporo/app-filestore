@@ -2,6 +2,8 @@
 
 ## Usage
 
+### Run the example server
+
 Build the module:
 
 ```shell
@@ -13,10 +15,10 @@ Start the example:
 ```shell
 export DEBUG=app*
 export LOGOLITE_DEBUGLOG_ENABLED=true
-node test/app
+node test/example
 ```
 
-## How to upload files
+### How to upload files
 
 You can upload a file using the __curl__ utility:
 

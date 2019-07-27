@@ -7,6 +7,10 @@ module.exports = {
     appFilestore: {
       contextPath: contextPath,
       uploadDir: path.join(__dirname, '../data')
-    }
+    },
+    appTracelog: {
+      tracingPaths: [ contextPath ],
+      tracingBoundaryEnabled: true,
+    },
   }
 };

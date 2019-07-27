@@ -31,11 +31,13 @@
     "devebot-plugin"
   ],
   "peerDependencies": {
+    "app-tracelog": "^0.3.1",
     "app-webweaver": "^0.3.0",
     "devebot": "^0.3.0",
     "devebot-co-mongojs": "^0.3.0"
   },
   "dependencies": {
+    "app-tracelog": "^0.3.1",
     "app-webweaver": "^0.3.0",
     "devebot": "^0.3.0",
     "devebot-co-mongojs": "^0.3.0",
