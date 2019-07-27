@@ -11,7 +11,7 @@ function Servlet(params = {}) {
   };
 
   this.stop = function() {
-    return Promise.resolve();
+    return Promise.resolve(mongoManipulator.close());
   };
 };
 

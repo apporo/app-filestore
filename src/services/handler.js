@@ -20,7 +20,6 @@ function Handler(params = {}) {
   const contextPath = pluginCfg.contextPath || '/filestore';
 
   const uploadDir = pluginCfg.uploadDir;
-  const thumbnailDir = pluginCfg.thumbnailDir || uploadDir;
 
   this.getFileUrls = function(fileIds) {
     fileIds = fileIds || [];
@@ -80,7 +79,7 @@ function Handler(params = {}) {
         })();
         case 'base64':
         // fileSource is the file content in base64 format
-        let fs_writeFile = Promise.promisify(fs.writeFile, {context: fs});
+        const fs_writeFile = Promise.promisify(fs.writeFile, {context: fs});
         fileSource = fileSource.replace(/^data:image\/[a-zA-Z0-9]*;base64,/, "");
         return fs_writeFile(path.join(ctx.uploadDirPath, fileName), fileSource, {
           encoding: 'base64'
@@ -122,3 +121,4 @@ Handler.referenceHash = {
 };
 
 module.exports = Handler;
+
