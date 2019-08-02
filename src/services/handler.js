@@ -18,7 +18,6 @@ function Handler(params = {}) {
 
   const pluginCfg = params.sandboxConfig || {};
   const contextPath = pluginCfg.contextPath || '/filestore';
-
   const uploadDir = pluginCfg.uploadDir;
 
   this.getFileUrls = function(fileIds) {
@@ -29,7 +28,7 @@ function Handler(params = {}) {
         if (lodash.isEmpty(fileData)) {
           return { fileId }
         } else {
-          return lodash.pick(fileData, ['fileId', 'fileUrl']);
+          return lodash.pick(fileData, ['_id', 'fileId', 'fileUrl']);
         }
       })
     }, {concurrency: 4});
@@ -95,10 +94,18 @@ function Handler(params = {}) {
         { fileId: fileId }, fileInfo, { multi: true, upsert: false });
     })
     .then(function() {
-      L.has('debug') && L.log('debug', ' - the /upload has been successful.');
+      const fileCollection = mongoManipulator.mongojs.collection(pluginCfg.collections.FILE);
+      const findOne = Promise.promisify(fileCollection.findOne, { context: fileCollection });
+      return findOne({ fileId: fileId });
+    })
+    .then(function(doc) {
+      L.has('debug') && L.log('debug', T.toMessage({
+        text: 'The /upload has been done successfully'
+      }));
       let returnInfo = {};
-      returnInfo['fileId'] = fileId;
-      returnInfo['fileUrl'] = path.join(contextPath, '/download/' + fileId);
+      returnInfo['_id'] = doc._id;
+      returnInfo['fileId'] = doc.fileId;
+      returnInfo['fileUrl'] = doc.fileUrl;
       return returnInfo;
     });
   }
