@@ -20,10 +20,9 @@ function Handler(params = {}) {
   const contextPath = pluginCfg.contextPath || '/filestore';
   const uploadDir = pluginCfg.uploadDir;
 
-  this.getFileUrls = function(fileIds) {
-    fileIds = fileIds || [];
+  this.getFileUrls = function(fileIds = []) {
     return Promise.map(fileIds, function(fileId) {
-      let r = mongoManipulator.findOneDocument(pluginCfg.collections.FILE, {fileId});
+      const r = mongoManipulator.findOneDocument(pluginCfg.collections.FILE, {fileId});
       return r.then(function(fileData) {
         if (lodash.isEmpty(fileData)) {
           return { fileId }
