@@ -12,9 +12,10 @@ const Promise = Devebot.require('bluebird');
 const lodash = Devebot.require('lodash');
 
 function Handler(params = {}) {
-  const { mongoManipulator } = params;
-  const L = params.loggingFactory.getLogger();
-  const T = params.loggingFactory.getTracer();
+  const { loggingFactory, mongoManipulator } = params;
+
+  const L = loggingFactory.getLogger();
+  const T = loggingFactory.getTracer();
 
   const pluginCfg = params.sandboxConfig || {};
   const contextPath = pluginCfg.contextPath || '/filestore';
