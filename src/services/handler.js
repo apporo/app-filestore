@@ -124,6 +124,8 @@ function base64MimeType(encoded) {
 }
 
 Handler.referenceHash = {
+  initializer: 'initializer',
+  errorManager: 'app-errorlist/manager',
   mongoManipulator: "mongojs#manipulator"
 };
 

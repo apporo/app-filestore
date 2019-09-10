@@ -4,6 +4,8 @@ module.exports = {
       contextPath: '/filestore',
       collections: {
         FILE: 'files'
+      },
+      errorCodes: {
       }
     }
   },
