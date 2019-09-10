@@ -23,7 +23,8 @@ node test/example
 You can upload a file using the __curl__ utility:
 
 ```shell
-$ curl -i -X POST -H "Content-Type: multipart/form-data" \
+curl -i -X POST \
+-H "Content-Type: multipart/form-data" \
 -F "data=@./test/lab/images/logbeat.png" \
 -F "fileId=612d388f-0569-427f-88ad-257e52a3b1a5" \
 "http://localhost:7979/example/upload"
