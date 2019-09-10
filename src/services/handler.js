@@ -11,7 +11,7 @@ const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
 const lodash = Devebot.require('lodash');
 
-const slugify = require('../supports/string-slugify');
+const stringUtil = require('../supports/string-util');
 
 function Handler(params = {}) {
   const { loggingFactory, mongoManipulator } = params;
@@ -54,10 +54,7 @@ function Handler(params = {}) {
     fileInfo.name = fileInfo.name || fileId;
 
     fileInfo.originalName = fileInfo.name;
-    fileInfo.name = slugify(fileInfo.name, {
-      locale: 'vi',
-      lower: true
-    });
+    fileInfo.name = stringUtil.slugify(fileInfo.name);
 
     let fileName = fileInfo.name;
     let ctx = {};

@@ -16,7 +16,7 @@ const Devebot = require('devebot');
 const Promise = Devebot.require('bluebird');
 const lodash = Devebot.require('lodash');
 
-const slugify = require('../supports/string-slugify');
+const stringUtil = require('../supports/string-util');
 
 function Service(params = {}) {
   const { filestoreHandler, mongoManipulator, tracelogService, webweaverService } = params;
@@ -104,7 +104,8 @@ function Service(params = {}) {
       let mimetype = mime.lookup(thumbnailFile);
       L.has('silly') && L.log('silly', ' - filename: %s', filename);
       L.has('silly') && L.log('silly', ' - mimetype: %s', mimetype);
-      res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+      let originalName = stringUtil.slugify(filename);
+      res.setHeader('Content-disposition', 'attachment; filename=' + originalName);
       res.setHeader('Content-type', mimetype);
       let filestream = fs.createReadStream(thumbnailFile);
       filestream.on('end', function() {
@@ -143,7 +144,7 @@ function Service(params = {}) {
       L.has('silly') && L.log('silly', ' - filename: %s', filename);
       L.has('silly') && L.log('silly', ' - filepath: %s', filepath);
       L.has('silly') && L.log('silly', ' - mimetype: %s', mimetype);
-      let originalName = slugify(filename, { locale: 'vi', lower: true });
+      let originalName = stringUtil.slugify(filename);
       res.setHeader('Content-disposition', 'attachment; filename=' + originalName);
       res.setHeader('Content-type', mimetype);
       let filestream = fs.createReadStream(filepath);
