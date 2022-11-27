@@ -1,10 +1,12 @@
 {
   "presets": [
-    ["env", {
-      "targets": {
-        "node": "4.0"
+    [
+      "@babel/preset-env", {
+        "targets": {
+          "node": "12"
+        }
       }
-    }]
+    ]
   ],
   "env": {
     "production": {
