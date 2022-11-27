@@ -37,7 +37,6 @@ function Handler(params = {}) {
   }
 
   /**
-   * 
    * @param {*} args
    *   fileId: UUID
    *   fileType: 'path', 'stream' or 'base64'
@@ -73,7 +72,7 @@ function Handler(params = {}) {
       return Promise.promisify(mkdirp)(ctx.uploadDirPath);
     })
     .then(function() {
-      switch(fileType) {
+      switch (fileType) {
         case 'path':
         return Promise.promisify(function(done) {
           // fileSource is the path of temporary file in this scenario
@@ -135,4 +134,3 @@ Handler.referenceHash = {
 };
 
 module.exports = Handler;
-

@@ -40,9 +40,9 @@ function Service(params = {}) {
     let box = {};
     Promise.resolve()
     .then(function() {
-      L.has('silly') && L.log('silly', ' - /picture/%s/%s/%s is request', 
+      L.has('silly') && L.log('silly', ' - /picture/%s/%s/%s is request',
             req.params.fileId, req.params.width, req.params.height);
-      
+
       if (lodash.isEmpty(req.params.fileId)) {
         return Promise.reject('fileId_is_empty');
       }
@@ -58,7 +58,7 @@ function Service(params = {}) {
       box.height = req.params.height;
 
       return mongoManipulator.findOneDocument(
-        pluginCfg.collections.FILE, { 
+        pluginCfg.collections.FILE, {
           fileId: req.params.fileId,
           status: 'ok'
         });
@@ -96,7 +96,7 @@ function Service(params = {}) {
               done(err);
             }
           );
-        });  
+        });
       })();
     })
     .then(function(thumbnailFile) {
@@ -129,7 +129,7 @@ function Service(params = {}) {
         return Promise.reject('fileId_is_empty');
       }
       return mongoManipulator.findOneDocument(
-        pluginCfg.collections.FILE, { 
+        pluginCfg.collections.FILE, {
           fileId: req.params.fileId,
           status: 'ok'
         });

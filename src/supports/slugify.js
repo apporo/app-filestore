@@ -30,8 +30,7 @@ SOFTWARE.
   /* istanbul ignore next */
   else if (typeof define === 'function' && define.amd) {
     define(factory)
-  }
-  else {
+  } else {
     root[name] = factory()
   }
 }('slugify', this, function () {
